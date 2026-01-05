@@ -160,7 +160,7 @@ class FDMNESParameters(MSONable, _BaseParameters):
 
         transition_metal_ranges = [range(21, 31), range(39, 49), range(57, 81)]
 
-        if cards["Green"] == True:
+        if cards.get("Green", False):
             return cards
         
         else:
@@ -215,8 +215,24 @@ class FDMNESParameters(MSONable, _BaseParameters):
             ``{"pass": True, "errors": dict(), "path": ...}``.
         """
 
-        structure = kwargs["structure_uc"]
-        sites = kwargs["sites"]
+        structure = kwargs.get("structure_uc", kwargs["structure"])
+
+        Z_absorber = kwargs.get("Z_absorber")
+
+        sites = kwargs.get("sites")
+        if sites is None:
+            # Infer absorber sites from Z_absorber; if absent, default to the first site
+            if Z_absorber is None:
+                sites = [0]
+            else:
+                if isinstance(Z_absorber, (list, tuple, set)):
+                    zset = {int(z) for z in Z_absorber}
+                else:
+                    zset = {int(Z_absorber)}
+
+                sites = [i for i, s in enumerate(structure) if int(s.specie.Z) in zset]
+                if not sites:
+                    raise ValueError(f"No absorber sites found for Z_absorber={Z_absorber}.")
         
         all_species = [structure[site].specie.symbol for site in sites]
         species = list(dict.fromkeys(all_species))
@@ -231,11 +247,11 @@ class FDMNESParameters(MSONable, _BaseParameters):
         for i in range(len(Z_absorbers)):
             specie = species[i]
             Z_absorber = Z_absorbers[i]
-            path = target_directory / Path(specie)
-            path.mkdir(exist_ok=True, parents=True)
+
+            target_directory.mkdir(exist_ok=True, parents=True)
 
             fdmnesinput = self.get_FDMNESinput(structure, Z_absorber)
-            filepath = path / f"{specie}_in.txt"
+            filepath = target_directory / f"{specie}_in.txt"
 
             with open(filepath, "w") as f:
                 f.write("Filout\n")
