@@ -1,0 +1,37 @@
+Filout
+  Ti
+
+Range
+  -5. 0.2 60.
+
+Radius
+  5.0
+
+Energpho
+
+Memory_save
+
+Quadrupole
+
+Spinorbit
+
+SCF
+
+Full_atom
+
+Perdew
+
+Crystal 
+3.0330 3.0330 3.0330 60.0 60.0 60.0
+  22 0.0000 0.0000 0.0000
+  8 0.5000 0.5000 0.5000
+
+Z_Absorber
+  22
+
+Edge 
+  K
+
+Convolution 
+
+End
