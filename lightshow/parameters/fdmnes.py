@@ -1,4 +1,3 @@
-from pathlib import Path
 from warnings import warn
 
 from monty.json import MSONable
